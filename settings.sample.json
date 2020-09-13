@@ -1,0 +1,10 @@
+{
+    "adamahAccount": "user@sample.com",
+    "adamahPassword": "password",
+    "mailSenderAccount": "mysender@gmail.com",
+    "mailSenderPassword": "senderpassword",
+    "recipients": [
+        "recipient1@test.com",
+        "recipient2@test.com"
+    ]
+}
