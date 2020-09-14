@@ -29,7 +29,7 @@ if not Path(logdir).exists():
     Path(logdir).mkdir()
 if not Path(logfile).exists():
     Path(logfile).touch()
-logging.basicConfig(filename=logfile, level=logging.INFO)
+logging.basicConfig(filename=logfile, level=logging.INFO, format='%(asctime)s %(message)s')
 
 def store_lasthandled(sid):
     f = open(storagefile, "w")
