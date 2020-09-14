@@ -1,12 +1,19 @@
 import json
 import os
+import logging
 from datetime import datetime
 from datetime import timedelta
+from pathlib import Path
 
 import api_client
 import notification
 
+notification_active = True
+persistence_active = True
+
 storagefile = 'storage.dat'
+logdir = 'logs'
+logfile = '{}/watcher.log'.format(logdir)
 
 f = open('settings.json', "r")
 settings = json.load(f)
@@ -18,6 +25,11 @@ mailSenderAccount = settings['mailSenderAccount']
 mailSenderPassword = settings['mailSenderPassword']
 recipients = settings['recipients']
 
+if not Path(logdir).exists():
+    Path(logdir).mkdir()
+if not Path(logfile).exists():
+    Path(logfile).touch()
+logging.basicConfig(filename=logfile, level=logging.INFO)
 
 def store_lasthandled(sid):
     f = open(storagefile, "w")
@@ -45,7 +57,10 @@ def get_unhandled_populated(deliveries, last_handled_sid):
     return populated_deliveries
 
 
-last_handled = load_lasthandled()
+if persistence_active:
+    last_handled = load_lasthandled()
+else:
+    last_handled = 0
 handled = last_handled
 
 token = api_client.login(adamahAccount, adamahPassword)
@@ -55,10 +70,20 @@ next_week = today + timedelta(days=7)
 
 deliveries = api_client.getdeliveries(token, today, next_week)
 new_deliveries = get_unhandled_populated(deliveries, last_handled)
+if len(new_deliveries) == 0:
+    logging.info('No new deliveries available')
 for new_delivery in new_deliveries:
-    notification.send_notifications(
-        mailSenderAccount, mailSenderPassword, recipients, new_delivery)
-    handled = max([handled, new_delivery['sid']])
+    delivery_id = new_delivery['sid']
+    logging.info('Found new delivery: {}'.format(delivery_id))
+    if (notification_active):
+        logging.info('Sending notifications to {}'.format(recipients))
+        notification.send_notifications(
+            mailSenderAccount, mailSenderPassword, recipients, new_delivery)
+        logging.info('Done sending notifications')
+    else:
+        logging.info('Would have sent notifications to {}'.format(recipients))
+    handled = max([handled, delivery_id])
 
-if (handled != last_handled):
+if persistence_active and (handled != last_handled):
     store_lasthandled(handled)
+    logging.info('Stored last handled delivery: {}'.format(handled))

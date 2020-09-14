@@ -128,7 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+.vscode
 
 # Adamah specific
 settings.json
 storage.dat
+logs/
