@@ -51,9 +51,9 @@ def load_lasthandled():
         return 0
 
 
-def get_unhandled_populated(deliveries, last_handled_sid):
+def get_unhandled_populated(deliveries, last_handled_id):
     populated_deliveries = list(filter(
-        lambda delivery: 'contentDescPos' in delivery['deliveryPositions'][0]['productDetail'] and delivery['sid'] > last_handled_sid, deliveries))
+        lambda delivery: 'contentDescPos' in delivery['deliveryPositions'][0]['productDetail'] and delivery['deliveryDate'] > last_handled_id, deliveries))
     return populated_deliveries
 
 
@@ -73,7 +73,7 @@ new_deliveries = get_unhandled_populated(deliveries, last_handled)
 if len(new_deliveries) == 0:
     logging.info('No new deliveries available')
 for new_delivery in new_deliveries:
-    delivery_id = new_delivery['sid']
+    delivery_id = new_delivery['deliveryDate']
     logging.info('Found new delivery: {}'.format(delivery_id))
     if (notification_active):
         logging.info('Sending notifications to {}'.format(recipients))
