@@ -131,6 +131,6 @@ dmypy.json
 .vscode
 
 # Adamah specific
-settings.json
-storage.dat
+config/settings.json
+data/
 logs/

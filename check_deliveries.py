@@ -3,19 +3,25 @@ import os
 import logging
 from datetime import datetime
 from datetime import timedelta
-from pathlib import Path
 
 import api_client
 import notification
+import file_helper
 
 notification_active = True
 persistence_active = True
 
-storagefile = 'storage.dat'
-logdir = 'logs'
+configdir = 'config'
+datadir = 'data'
+logdir = 'log'
+
+configfile = '{}/settings.json'.format(configdir)
+storagefile = '{}/storage.dat'.format(datadir)
 logfile = '{}/watcher.log'.format(logdir)
 
-f = open('settings.json', "r")
+file_helper.ensure_directories([configdir, datadir, logdir])
+
+f = open(configfile, "r")
 settings = json.load(f)
 f.close()
 
@@ -25,11 +31,10 @@ mailSenderAccount = settings['mailSenderAccount']
 mailSenderPassword = settings['mailSenderPassword']
 recipients = settings['recipients']
 
-if not Path(logdir).exists():
-    Path(logdir).mkdir()
-if not Path(logfile).exists():
-    Path(logfile).touch()
-logging.basicConfig(filename=logfile, level=logging.INFO, format='%(asctime)s %(message)s')
+file_helper.touch_file(logfile)
+logging.basicConfig(filename=logfile, level=logging.INFO,
+                    format='%(asctime)s %(message)s')
+
 
 def store_lasthandled(sid):
     f = open(storagefile, "w")
