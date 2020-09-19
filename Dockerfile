@@ -1,10 +1,11 @@
 FROM python:3-slim
 
-ADD *.px /
+ADD *.py requirements.txt /
+
+RUN pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir -r requirements.txt && \
+    rm requirements.txt
 
 VOLUME [ "/config", "/data", "/log" ]
 
-# dummy cmd to instantly terminate
-# this is a tool image, containers should be run by triggering program invocation externally
-# e.g. docker exec adamah python3 check_deliveries.py
-CMD /bin/true
+CMD python3 check_deliveries.py
