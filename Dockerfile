@@ -1,10 +1,6 @@
-FROM python:3
+FROM python:3-slim
 
-ADD *.py requirements.txt /
-
-RUN pip3 install --upgrade pip && \
-    pip3 install --no-cache-dir -r requirements.txt && \
-    rm requirements.txt
+ADD *.py /
 
 VOLUME [ "/config", "/data", "/log" ]
 
