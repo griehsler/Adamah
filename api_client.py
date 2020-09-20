@@ -17,14 +17,14 @@ def login(user, password):
     response = json.loads(connection.getresponse().read().decode())
     return_code = response['returnCode']
     if return_code != 1:
-        raise Exception('Login failed: {}'.format(response["msg"]))
+        raise Exception(f'Login failed: {response["msg"]}')
     return response['token']
 
 
 def getdeliveries(token, fromdate, todate):
     headers = {
         'Content-type': 'application/json',
-        'Authorization': 'Bearer {}'.format(token)
+        'Authorization': f'Bearer {token}'
     }
     request = {"deliveryDateFrom": int(fromdate.timestamp() * 1000),
                "deliveryDateTo": int(todate.timestamp() * 1000)}

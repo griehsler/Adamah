@@ -1,8 +1,7 @@
 import json
 import os
 import logging
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import api_client
 import notification
@@ -15,9 +14,9 @@ configdir = 'config'
 datadir = 'data'
 logdir = 'log'
 
-configfile = '{}/settings.json'.format(configdir)
-storagefile = '{}/storage.dat'.format(datadir)
-logfile = '{}/watcher.log'.format(logdir)
+configfile = f'{configdir}/settings.json'
+storagefile = f'{datadir}/storage.dat'
+logfile = f'{logdir}/watcher.log'
 
 file_helper.ensure_directories([configdir, datadir, logdir])
 
@@ -79,16 +78,17 @@ if len(new_deliveries) == 0:
     logging.info('No new deliveries available')
 for new_delivery in new_deliveries:
     delivery_id = new_delivery['deliveryDate']
-    logging.info('Found new delivery: {}'.format(delivery_id))
+    logging.info(f'Found new delivery: {delivery_id}')
     if (notification_active):
-        logging.info('Sending notifications to {}'.format(recipients))
+        logging.info(f'Sending notifications to {recipients}')
         notification.send_notifications(
             mailSenderAccount, mailSenderPassword, recipients, new_delivery)
         logging.info('Done sending notifications')
     else:
-        logging.info('Would have sent notifications to {}'.format(recipients))
+        logging.info(f'Would have sent notifications to {recipients}')
+        notification.get_message(new_delivery)
     handled = max([handled, delivery_id])
 
 if persistence_active and (handled != last_handled):
     store_lasthandled(handled)
-    logging.info('Stored last handled delivery: {}'.format(handled))
+    logging.info(f'Stored last handled delivery: {handled}')
