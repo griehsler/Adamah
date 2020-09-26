@@ -77,6 +77,7 @@ new_deliveries = get_unhandled_populated(deliveries, last_handled)
 if len(new_deliveries) == 0:
     logging.info('No new deliveries available')
 for new_delivery in new_deliveries:
+    #file_helper.dump_json(new_delivery, 'delivery.json')
     delivery_id = new_delivery['deliveryDate']
     logging.info(f'Found new delivery: {delivery_id}')
     if (notification_active):

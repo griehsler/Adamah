@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 
 def ensure_directories(directories):
@@ -10,3 +11,9 @@ def ensure_directories(directories):
 def touch_file(file):
     if not Path(file).exists():
         Path(file).touch()
+
+
+def dump_json(document, filename):
+    f = open(filename, "w")
+    json.dump(document, f)
+    f.close()
