@@ -7,9 +7,6 @@ import api_client
 import notification
 import file_helper
 
-notification_active = True
-persistence_active = True
-
 configdir = 'config'
 datadir = 'data'
 logdir = 'log'
@@ -28,7 +25,8 @@ adamahAccount = settings['adamahAccount']
 adamahPassword = settings['adamahPassword']
 mailSenderAccount = settings['mailSenderAccount']
 mailSenderPassword = settings['mailSenderPassword']
-recipients = settings['recipients']
+recipients = settings.get('recipients', [])
+disable_storage = settings.get('disableStorage', False)
 
 file_helper.touch_file(logfile)
 logging.basicConfig(filename=logfile, level=logging.INFO,
@@ -61,10 +59,10 @@ def get_unhandled_populated(deliveries, last_handled_id):
     return populated_deliveries
 
 
-if persistence_active:
-    last_handled = load_lasthandled()
-else:
+if disable_storage:
     last_handled = 0
+else:
+    last_handled = load_lasthandled()
 handled = last_handled
 
 token = api_client.login(adamahAccount, adamahPassword)
@@ -80,16 +78,12 @@ for new_delivery in new_deliveries:
     #file_helper.dump_json(new_delivery, 'delivery.json')
     delivery_id = new_delivery['deliveryDate']
     logging.info(f'Found new delivery: {delivery_id}')
-    if (notification_active):
-        logging.info(f'Sending notifications to {recipients}')
-        notification.send_notifications(
-            mailSenderAccount, mailSenderPassword, recipients, new_delivery)
-        logging.info('Done sending notifications')
-    else:
-        logging.info(f'Would have sent notifications to {recipients}')
-        notification.get_message(new_delivery)
+    logging.info(f'Sending notifications to {recipients}')
+    notification.send_notifications(
+        mailSenderAccount, mailSenderPassword, recipients, new_delivery)
+    logging.info('Done sending notifications')
     handled = max([handled, delivery_id])
 
-if persistence_active and (handled != last_handled):
+if (not disable_storage) and (handled != last_handled):
     store_lasthandled(handled)
     logging.info(f'Stored last handled delivery: {handled}')

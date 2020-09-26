@@ -28,11 +28,12 @@ def get_message(delivery):
 
 
 def send_notifications(mailSenderAccount, mailSenderPassword, recipients, delivery):
-    message = get_message(delivery)
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("smtp.gmail.com", context=context) as server:
-        server.login(mailSenderAccount, mailSenderPassword)
-        server.sendmail(mailSenderAccount, recipients, message.as_string())
+    if len(recipients) > 0:
+        message = get_message(delivery)
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", context=context) as server:
+            server.login(mailSenderAccount, mailSenderPassword)
+            server.sendmail(mailSenderAccount, recipients, message.as_string())
 
 
 def convert_date(unixtimestamp):
